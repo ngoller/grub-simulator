@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecosystem Simulation</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <canvas id="simulationCanvas"></canvas>
+
+    <script src="shader.js"></script>
+    <script type="module" src="simulation.js"></script>
+    <label for="speedControl">Simulation Speed:</label>
+    <input type="number" id="speedControl" min="1" max="10000" value="1">
+    <div id="speedDisplay">Current Speed: 1x</div>
+    <div id="time">Time: 0</div>
+    <div id="population">0 grubs, 0 plants, 0 predators</div>
+</body>
+
+</html>
