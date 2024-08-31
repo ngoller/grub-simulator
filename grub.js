@@ -2,6 +2,10 @@
 
 import { drawObject } from './utils.js';
 
+export function createGrub() {
+    return new Grub(0, 0);
+}
+
 export class Grub {
     constructor(x, y) {
         this.x = x;

@@ -1,10 +1,9 @@
 // simulation.js
 
-import { Grub } from './grub.js';
+import { Grub, createGrub } from './grub.js';
 import { Plant } from './plant.js';
-import { Predator } from './predator.js';
-import { drawObject } from './utils.js'; // Import drawObject
-
+import { Predator, createPredator } from './predator.js';
+import { ObjectPool } from './object_pool.js';
 
 let speedFactor = 1;  // This gets changed by the speed-up widget
 
@@ -64,8 +63,32 @@ const grubs = [];
 const plants = [];
 const predators = [];
 
+const predatorPool = new ObjectPool(createPredator, 100);
+const grubPool = new ObjectPool(createGrub, 100);
+
+function spawnPredator(x, y) {
+    const predator = predatorPool.acquire();
+    predator.x = x;
+    predator.y = y;
+    predator.energy = 0;
+    predator.velocity = { x: (Math.random() - 0.5) * 10, y: (Math.random() - 0.5) * 10 };
+    predator.isDead = false;
+
+    return predator;
+}
+
+function spawnGrub(x, y) {
+    const grub = grubPool.acquire();
+    grub.x = x;
+    grub.y = y;
+    grub.energy = 0;
+    grub.velocity = { x: (Math.random() - 0.5) * 10, y: (Math.random() - 0.5) * 10 };
+
+    return grub;
+}
+
 for (let i = 0; i < 50; i++) {
-    grubs.push(new Grub(Math.random() * canvas.width, Math.random() * canvas.height));
+    grubs.push(spawnGrub(Math.random() * canvas.width, Math.random() * canvas.height));
 }
 
 for (let i = 0; i < 100; i++) {
@@ -73,7 +96,7 @@ for (let i = 0; i < 100; i++) {
 }
 
 for (let i = 0; i < 5; i++) {
-    predators.push(new Predator(Math.random() * canvas.width, Math.random() * canvas.height));
+    predators.push(spawnPredator(Math.random() * canvas.width, Math.random() * canvas.height));
 }
 
 function updateSimulation() {
@@ -90,7 +113,7 @@ function update() {
 
     for (let i = predators.length - 1; i >= 0; i--) {
         const predator = predators[i];
-        const newPredator = predator.hunt(grubs, canvas);
+        const newPredator = predator.hunt(grubs, canvas, grubPool);
         if (newPredator) {
             predators.push(newPredator);
         }
@@ -99,6 +122,7 @@ function update() {
         predator.updateEnergy();
 
         if (predators[i].isDead) {  // Assuming you set isDead when energy reaches 0
+            predatorPool.release(predator);
             predators.splice(i, 1);  // Remove dead predator from the array
         }
     }

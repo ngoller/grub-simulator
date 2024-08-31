@@ -1,6 +1,10 @@
 // predator.js
 import { drawObject } from './utils.js';
 
+export function createPredator() {
+    return new Predator(0, 0);
+}
+
 export class Predator {
     constructor(x, y) {
         this.x = x;
@@ -13,6 +17,7 @@ export class Predator {
         this.minSeparation = 20; // Minimum distance from other predators
         this.energyLossPerTick = 1; // Energy lost per update cycle
         this.starvationThreshold = -500; // Threshold below which the predator starves
+        this.isDead = false;
     }
 
     updateEnergy() {
@@ -27,7 +32,7 @@ export class Predator {
     }
 
     // return any predators created by hunting
-    hunt(grubs, canvas) {
+    hunt(grubs, canvas, grubPool) {
         let nearestGrub = null;
         let minDist = Infinity;
         for (let grub of grubs) {
@@ -64,6 +69,7 @@ export class Predator {
             if (minDist < this.size) {
                 this.energy = Math.max(this.energy, 0);
                 this.energy += 10;  // Increase energy
+                grubPool.release(nearestGrub);
                 grubs.splice(grubs.indexOf(nearestGrub), 1); // Remove the grub from the array
             }
         }
